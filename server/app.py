@@ -33,13 +33,14 @@ def messages():
             messages,
             200
         )
+    
         return response
     
     elif request.method == 'POST':
+        msg = request.get_json()
         new_message = Message(
-            body=request.form.get("body"),
-            username=request.form.get("username"),
-        )
+            body=msg["body"], 
+            username=msg["username"])
 
         db.session.add(new_message)
         db.session.commit()
@@ -76,10 +77,15 @@ def messages_by_id(id):
             return response
         
         elif request.method == 'PATCH':
+
             message = Message.query.filter(Message.id == id).first()
 
-            for attr in request.form:
-                setattr(message, attr, request.form.get(attr))
+            msg = request.get_json()
+
+            message.body = msg["body"]
+            
+            # for attr in request.form:
+            #     setattr(message, attr, request.form.get(attr))
             
             db.session.add(message)
             db.session.commit()
